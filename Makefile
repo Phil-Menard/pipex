@@ -2,7 +2,7 @@ CC = cc
 CFLAGS = -Wall -Werror -Wextra
 DEBUG_FLAGS = -g
 NAME = pipex
-SRC = pipex.c
+SRC = pipex.c \
 
 OBJ = $(SRC:.c=.o)
 

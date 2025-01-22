@@ -6,14 +6,27 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:23:50 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/22 17:26:42 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/22 18:13:34 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "pipex.h"
 #include <stdio.h>
 
-int	main(void)
+int	main(int argc, char **argv, char **env)
 {
-	printf("good\n");
+	int		i;
+	int		x;
+	char	*path = NULL;
+	(void) argv;
+	(void) argc;
+
+	x = 0;
+	i = 0;
+	while (ft_strncmp("PATH=", env[i], 5) != 0)
+		i++;
+	path = ft_strdup(env[i] + 5);
+	ft_printf("%s\n", path);
+	free(path);
 	return (0);
 }
