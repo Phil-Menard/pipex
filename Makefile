@@ -3,6 +3,8 @@ CFLAGS = -Wall -Werror -Wextra
 DEBUG_FLAGS = -g
 NAME = pipex
 SRC = pipex.c \
+	utils.c \
+	path.c
 
 OBJ = $(SRC:.c=.o)
 
