@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 17:19:45 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/23 17:20:42 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/23 18:45:07 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ char	**fill_arg(char *path, char *argv)
 	i = 1;
 	while (arg[i])
 		i++;
-	arg[i] = NULL;
 	return (arg);
 }
 
@@ -63,5 +62,6 @@ char	*get_right_path(char **env, char *argv)
 		free(path);
 		i++;
 	}
+	free_db_array(arr);
 	return (NULL);
 }
