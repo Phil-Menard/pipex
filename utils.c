@@ -6,11 +6,30 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 17:18:03 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/23 17:20:03 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/24 17:39:44 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+char	**get_cmds(char **argv, int argc, int nb_cmds)
+{
+	char	**res;
+	int		i;
+	int		j;
+
+	res = malloc((nb_cmds + 1) * sizeof(char *));
+	j = 0;
+	i = 2;
+	while (i < (argc - 1))
+	{
+		res[j] = ft_strdup(argv[i]);
+		j++;
+		i++;
+	}
+	res[j] = NULL;
+	return (res);
+}
 
 void	free_db_array(char **arr)
 {
@@ -51,4 +70,24 @@ char	*ft_strjoin_path(char const *s1, char slash, char const *s2)
 	}
 	ptr[i] = '\0';
 	return (ptr);
+}
+
+void	create_child(int *id, int nb_cmds)
+{
+	int	i;
+
+	i = 1;
+	while (i < nb_cmds)
+	{
+		if (id[i] != 0)
+		{
+			id[i] = fork();
+			if (id[i] == -1)
+			{
+				perror("fork");
+				exit(EXIT_FAILURE);
+			}
+		}
+		i++;
+	}
 }
