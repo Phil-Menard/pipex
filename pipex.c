@@ -6,22 +6,51 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:23:50 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/24 11:35:44 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/24 13:09:33 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/*
-child1 => write result from execve to child2
-child2 => read result, and do another execve applied to the result
-*/
+//write result fo first cmd here
+void	first_child_process(int *pipefd, char *path, char **arg)
+{
+	close(pipefd[0]);
+	dup2(pipefd[1], STDOUT_FILENO);
+	if (execve(path, arg, NULL) == -1)
+	{
+		perror("execve");
+		exit(EXIT_FAILURE);
+	}
+	close(pipefd[1]);
+}
+
+void	parent_process(int *pipefd)
+{
+	char	*buf;
+
+	close(pipefd[1]);
+	buf = get_next_line(pipefd[0]);
+	//we read the result of the cmd
+	while (buf != NULL)
+	{
+		printf("%s", buf);
+		free(buf);
+		buf = get_next_line(pipefd[0]);
+		//send the result of the cmd back to second child, and second child
+		//apply other cmd to the result of the cmd
+		//and send it back to parent?
+	}
+	free(buf);
+	wait(NULL);
+	free(buf);
+	close(pipefd[0]);
+}
 
 void	pipex(char *path, char **arg)
 {
 	int		pipefd[2];
 	int		id;
-	char	*buf;
 
 	if (pipe(pipefd) == -1)
 	{
@@ -35,31 +64,9 @@ void	pipex(char *path, char **arg)
 		exit(EXIT_FAILURE);
 	}
 	if (id == 0)
-	{
-		close(pipefd[0]);
-		dup2(pipefd[1], STDOUT_FILENO);
-		if (execve(path, arg, NULL) == -1)
-		{
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
-		close(pipefd[1]);
-	}
+		first_child_process(pipefd, path, arg);
 	else
-	{
-		close(pipefd[1]);
-		buf = get_next_line(pipefd[0]);
-		while (buf != NULL)
-		{
-			printf("%s", buf);
-			free(buf);
-			buf = get_next_line(pipefd[0]);
-		}
-		free(buf);
-		wait(NULL);
-		free(buf);
-		close(pipefd[0]);
-	}
+		parent_process(pipefd);
 }
 
 int	main(int argc, char **argv, char **env)
