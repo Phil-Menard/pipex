@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:23:50 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/23 18:45:59 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/24 11:35:44 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,8 @@ void	pipex(char *path, char **arg)
 {
 	int		pipefd[2];
 	int		id;
-	int		bytes_read;
 	char	*buf;
 
-	buf = malloc(1000 * sizeof(char));
 	if (pipe(pipefd) == -1)
 	{
 		perror("pipe");
@@ -45,20 +43,22 @@ void	pipex(char *path, char **arg)
 			perror("execve");
 			exit(EXIT_FAILURE);
 		}
+		close(pipefd[1]);
 	}
 	else
 	{
 		close(pipefd[1]);
-		bytes_read = read(pipefd[0], buf, 1000);
-		if (bytes_read == -1)
+		buf = get_next_line(pipefd[0]);
+		while (buf != NULL)
 		{
-			perror("read");
-			exit(EXIT_FAILURE);
+			printf("%s", buf);
+			free(buf);
+			buf = get_next_line(pipefd[0]);
 		}
-		buf[bytes_read - 1] = '\0';
-		wait(NULL);
-		printf("%s\n", buf);
 		free(buf);
+		wait(NULL);
+		free(buf);
+		close(pipefd[0]);
 	}
 }
 
