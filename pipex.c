@@ -6,15 +6,57 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:23:50 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/24 18:14:32 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/26 18:52:45 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	read_process(int *pipefd, int *id)
+/*
+function to create pipes
+function to call wait(NULL) n times, where n is the number of childs
+in child process =>
+	close the useless pipes
+	here are the pipes useful for each child :
+		1st child : pipefd[0][1] (write to next child)
+		2nd child : pipefd[0][0] / pipefd[1][1] (listen from last/write to next)
+		3rd child : pipefd[1][0] (listen from last)
+	here are the pipes useless for each child :
+		1st child : pipefd[0][0] / pipefd[1][0] / pipefd[1][1]
+		2nd child : pipefd[0][1] / pipefd[1][0]
+		3rd child : pipefd[0][0] / pipefd[0][1] / pipefd[1][1]
+	read datas
+	close reading pipe
+	write datas
+	close writing pipe
+if statements for first and last child, respectively for reading and writing from/to file
+*/
+
+void	close_pipes(int **pipefd, int i)
 {
-	if (id[0] == 0)
+	int	j;
+	int	k;
+
+	j = 0;
+	if (i == 0)
+	{
+		while (pipefd[j] != -1)
+		{
+			k = 0;
+			while (k < 2)
+			{
+				if (!(i == 0 && j == 1))
+					close(pipefd[j][k]);
+				k++;
+			}
+			j++;
+		}
+	}
+}
+
+void	read_process(int **pipefd, int i)
+{
+	if (i == 0)
 		pipefd[0] = open("infile", O_RDONLY);
 	if (dup2(pipefd[0], STDIN_FILENO) == -1)
 	{
@@ -25,16 +67,17 @@ void	read_process(int *pipefd, int *id)
 	close(pipefd[0]);
 }
 
-void	child_process(int *pipefd, char **argv, char **env, int *id)
+void	child_process(int **pipefd, char **argv, char **env, int i)
 {
 	char	*path;
 	char	**arg;
 
-	path = get_right_path(env, argv[2]);
+	close_pipes(pipefd, i);
+	path = get_right_path(env, argv[i]);
 	if (!path)
 		exit(EXIT_FAILURE);
-	arg = fill_arg(path, argv[2]);
-	read_process(pipefd, id);
+	arg = fill_arg(path, argv[i]);
+	read_process(pipefd, i);
 	close(pipefd[0]);
 	dup2(pipefd[1], STDOUT_FILENO);
 	close(pipefd[1]);
@@ -77,34 +120,24 @@ void	child_process(int *pipefd, char **argv, char **env, int *id)
 	free_db_array(arg);
 } */
 
-void	handle_processes(char **argv, char **env, int *id, int *pipefd)
+void	handle_processes(char **argv, char **env, int *id, int **pipefd)
 {
 	int	i;
 
 	i = 0;
 	if (id[i] == 0)
-		child_process(pipefd, argv, env, id);
+		child_process(pipefd, argv, env, i);
 	else
-		parent_process(pipefd, argv, env);
+		wait(NULL);
 }
 
 void	pipex(char **argv, char **env, int nb_cmds)
 {
-	int	pipefd[2];
+	int	**pipefd;
 	int	*id;
 
+	pipefd = create_pipes(nb_cmds - 1);
 	id = malloc((nb_cmds + 1) * sizeof(int));
-	if (pipe(pipefd) == -1)
-	{
-		perror("pipe");
-		exit(EXIT_FAILURE);
-	}
-	id[0] = fork();
-	if (id[0] == -1)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
 	create_child(id, nb_cmds);
 	handle_processes(argv, env, id, pipefd);
 	free(id);
