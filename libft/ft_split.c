@@ -6,57 +6,58 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:36:53 by pmenard           #+#    #+#             */
-/*   Updated: 2024/11/12 16:22:46 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/27 16:51:25 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include <stdlib.h>
 
-int	count_words(char const *s, char c)
+static int	ft_countnbstring(char const *s, char c)
 {
-	int	nb_words;
 	int	i;
+	int	count;
 
 	i = 0;
-	nb_words = 0;
+	count = 0;
 	while (s[i])
 	{
-		if (s[i] != c)
-			nb_words++;
-		while (s[i] != c && s[i + 1] != '\0')
+		while (s[i] && s[i] == c)
 			i++;
-		i++;
+		if (s[i])
+			count++;
+		while (s[i] && s[i] != c)
+			i++;
 	}
-	return (nb_words);
+	return (count);
 }
 
 char	**ft_split(char const *s, char c)
 {
-	char	**ptr;
 	size_t	i;
 	int		j;
-	int		start_word;
+	char	**tab;
+	size_t	start;
+	size_t	end;
 
-	ptr = malloc((count_words(s, c) + 1) * sizeof(char *));
-	if (ptr == NULL)
+	tab = (char **) malloc ((ft_countnbstring(s, c) + 1) * sizeof(char *));
+	if (tab == NULL)
 		return (NULL);
 	i = 0;
 	j = 0;
-	start_word = 0;
-	while (s[i] && i < ft_strlen(s))
+	while (s[i])
 	{
-		if (s[i] != c && s[i])
-		{
-			start_word = i;
-			while (s[i] && s[i] != c)
-				i++;
-			ptr[j++] = ft_substr(s, start_word, i - start_word);
-		}
-		i++;
+		while (s[i] && s[i] == c)
+			i++;
+		start = i;
+		while (s[i] && s[i] != c)
+			i++;
+		end = i;
+		if (end > start)
+			tab[j++] = ft_substr(s, start, end - start);
 	}
-	ptr[j] = 0;
-	return (ptr);
+	tab[j] = 0;
+	return (tab);
 }
 
 /*#include <stdio.h>
