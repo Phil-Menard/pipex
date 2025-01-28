@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:23:50 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/28 18:44:10 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/28 19:48:58 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,6 @@ void	exec_cmds(int previous_fd, int next_fd, char *argv, char **env)
 	arg = fill_arg(path, argv);
 	if (execve(path, arg, NULL) == -1)
 	{
-		ft_printf("%s\n", arg[0]);
-		ft_printf("%s\n", arg[1]);
-		ft_printf("%s\n", arg[2]);
 		free(path);
 		free_db_array(arg);
 		perror("execve");
