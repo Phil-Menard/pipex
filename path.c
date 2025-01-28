@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 17:19:45 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/28 16:22:38 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/28 18:56:19 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,19 @@ char	*get_next_path(char **arr, char *argv, int i)
 	char	*cmd;
 	char	**args;
 
+	if (ft_strncmp("/", argv, 1) == 0)
+	{
+		if (access(argv, X_OK) != 0)
+		{
+			ft_putstr_fd(argv, 2);
+			ft_putstr_fd(": No such file or directory\n", 2);
+			exit(EXIT_FAILURE);
+		}
+		args = ft_split(argv, ' ');
+		cmd = ft_strdup(args[0]);
+		free_db_array(args);
+		return (cmd);
+	}
 	args = ft_split(argv, ' ');
 	cmd = ft_strdup(args[0]);
 	free_db_array(args);
