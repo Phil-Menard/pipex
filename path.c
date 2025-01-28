@@ -6,7 +6,7 @@
 /*   By: pmenard <pmenard@student.42perpignan.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 17:19:45 by pmenard           #+#    #+#             */
-/*   Updated: 2025/01/27 17:07:12 by pmenard          ###   ########.fr       */
+/*   Updated: 2025/01/28 16:22:38 by pmenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ char	**fill_arg(char *path, char *argv)
 {
 	char	**arg;
 
+	if (!path)
+		return (NULL);
 	arg = ft_split(argv, ' ');
 	free(arg[0]);
 	arg[0] = ft_strdup(path);
@@ -27,7 +29,7 @@ char	*get_next_path(char **arr, char *argv, int i)
 	char	*path;
 	char	*cmd;
 	char	**args;
-	
+
 	args = ft_split(argv, ' ');
 	cmd = ft_strdup(args[0]);
 	free_db_array(args);
